@@ -1,0 +1,53 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  namespace: mongodb
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:latest
+        resources:
+          limits:            # 限定资源
+            cpu: 500m
+            memory: 500Mi
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME  # 设置用户名
+            value: root
+          - name: MONGO_INITDB_ROOT_PASSWORD  # 设置密码
+            value: abcd0123
+        #volumeMounts:
+        #  - mountPath: /data/db                    
+        #    name: mongodb-volume
+      #volumes:
+      #  - name: mongodb-volume
+      #    hostPath:
+      #      path: /data/rs-mongodb-volume          # 映射的宿主机目录
+      #      type: DirectoryOrCreate
+ 
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mongodb
+  name: mongodb
+spec:
+  type: NodePort
+  selector:
+    app: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017
+    nodePort: 30017

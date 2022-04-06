@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocketmq-console-ng
+  namespace: rocketmq
+  labels:
+    name: rocketmq-console-ng
+spec:
+  selector:
+    matchLabels:
+      name: rocketmq-console-ng
+  template:
+    metadata:
+      name: rocketmq-console-ng
+      labels:
+        name: rocketmq-console-ng
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: rocketmq-console-ng
+        image: apacherocketmq/rocketmq-console:2.0.0
+        env:
+          - name: JAVA_OPT
+            value: -Drocketmq.namesrv.addr=rocketmq:9876
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: rocketmq-console-ng
+ namespace: rocketmq
+spec:
+ type: NodePort
+ ports:
+ - name: rocketmq-console-ng
+   port: 8080
+   protocol: TCP
+   targetPort: 8080
+   nodePort: 30082
+ selector:
+   name: rocketmq-console-ng
+
